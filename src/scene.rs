@@ -1,8 +1,11 @@
 extern crate image;
 extern crate cgmath;
-use cgmath::{Point3, Vector3, Matrix4};
+use image::ImageFormat;
+use image::{DynamicImage, GenericImage, Pixel, ImageBuffer, Rgba};
+use cgmath::{Matrix, VectorSpace, InnerSpace, Point3, Vector3, Matrix4};
 use std::rc::{Rc, Weak};
 use std::cell::RefCell;
+use std::fs::{File, OpenOptions};
 
 //const viewing_direction: Vector3<f64> = Vector3::new(0.0, 0.0, -1.0);     // Viewing direction (world coordinates)
 //const start_point: Vector3<f64> = Vector3::new(0.0, 0.0, -1.0);          // Center of the Image Plane (world coordinates)
@@ -23,10 +26,17 @@ impl Color {
             blue: b,
         }
     }
+
+    pub fn to_rgba(&self) -> Rgba<u8> {
+        Rgba::from_channels(self.red as u8,
+                        self.green as u8,
+                        self.blue as u8,
+                        255)
+    }
 }
 
 pub struct Scene {
-    root: Rc<RefCell<Node>>,
+    pub root: Rc<RefCell<Node>>,
     pub name: String,
     pub mainCamera: Rc<RefCell<CameraNode>>,
     pub renderer: Rc<RefCell<RenderSystem>>,
@@ -38,7 +48,7 @@ impl Scene {
             root: root,
             name: name,
             mainCamera: camera,
-            renderer: Rc::new(RefCell::new(RenderSystem {})),
+            renderer: Rc::new(RefCell::new(RenderSystem {output_path: "output.png".to_string()})),
         }
     }
 
@@ -49,9 +59,48 @@ impl Scene {
     pub fn add_camera(&mut self, camera: Rc<RefCell<CameraNode>>) {
         self.mainCamera = Rc::clone(&camera);
     }
+
+    pub fn get_renderer(&self) -> Rc<RefCell<RenderSystem>> {
+        return Rc::clone(&self.renderer);
+    }
+
 }
 
 pub struct RenderSystem {
+    pub output_path: String,
+}
+
+impl RenderSystem {
+    pub fn render(self, scene: &Scene, camera: Rc<RefCell<CameraNode>>) {
+        let width = (*camera).borrow_mut().image_width as u32;
+        let height = (*camera).borrow_mut().image_height as u32;
+        let mut image = DynamicImage::new_rgb8(width, height);
+
+        for x in 0..width {
+            for y in 0..height {
+                let ray = Ray::create_prime(x, y, width, height);
+                let black = Rgba::from_channels(0, 0, 0, 0);
+
+                //****************** IMPORTANT ********************************
+                //Only works with the current implemented scene in main.rs*****
+                let sphere = match (*scene.root).borrow_mut().get_child(0) {
+                    None => return,
+                    Some(x) => x,
+                };
+
+                if (*sphere).borrow_mut().intersect(&ray) {
+                    image.put_pixel(x, y, Rgba::from_channels(0, 255, 0, 0));
+                }
+                else {
+                    image.put_pixel(x, y, black);
+                }
+            }
+        }
+
+        let mut image_file = OpenOptions::new().write(true).truncate(true).create(true).open(self.output_path).unwrap();
+        image.save(&mut image_file, ImageFormat::PNG).unwrap();
+    }
+
 
 }
 
@@ -159,10 +208,18 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn create_prime(x: u32, y: u32, scene: &Scene) -> Ray {
+     pub fn create_prime(x: u32, y: u32, width: u32, height: u32) -> Ray {
+
+        let sensor_x = ((x as f64 + 0.5) / width as f64) * 2.0 - 1.0;
+        let sensor_y = 1.0 - ((y as f64 + 0.5) / height as f64) * 2.0;
+
         Ray {
             origin: Point3::new(0.0, 0.0, 0.0),
-            direction: Vector3::new(0.0, 0.0, 0.0),
+            direction: Vector3 {
+                    x: sensor_x,
+                    y: sensor_y,
+                    z: -1.0,
+                }.normalize(),
         }
     }
 }
@@ -172,6 +229,7 @@ pub trait Node {
     fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>>;
     fn add_child(&mut self, node: Rc<RefCell<Node>>);
     fn get_size(&self) -> usize;
+    fn intersect(&self, ray: &Ray) -> bool;
 }
 
 macro_rules! impl_T {
@@ -202,9 +260,49 @@ macro_rules! impl_T {
                 fn get_size(&self) -> usize {
                     return self.size;
                 }
+
+                fn intersect(&self, ray: &Ray) -> bool {
+                    return false;
+                }
             }
         )*
     }
 }
 
-impl_T!(for Node3D, CameraNode, SphereNode);
+impl_T!(for Node3D, CameraNode);
+
+impl Node for SphereNode {
+    fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
+        let strong = &self.parent.upgrade();
+        let strong = match strong {
+            Some(x) => x,
+            None => return None,
+        };
+        return Some(Rc::clone(&(*strong))); //Some(Rc::clone(&(*(&self.parent))));
+    }
+
+    fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>> {
+        if index >= self.size {
+            return None;
+        }
+        return Some(Rc::clone(&(self.childs[index])));
+    }
+
+    fn add_child(&mut self, node: Rc<RefCell<Node>>) {
+        self.size += 1;
+        self.childs.push(Rc::clone(&node));
+    }
+
+    fn get_size(&self) -> usize {
+        return self.size;
+    }
+
+    fn intersect(&self, ray: &Ray) -> bool {
+        let origin = Vector3::new(ray.origin.x, ray.origin.y, ray.origin.z);
+        let l = origin - self.frame_transform.row(3).truncate();
+        let adj2 = l.dot(ray.direction);
+        let d2 = l.dot(l) - (adj2 * adj2);
+
+        d2 < (self.radius * self.radius)
+    }
+}
