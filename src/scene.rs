@@ -33,6 +33,14 @@ pub struct Scene {
 }
 
 impl Scene {
+    fn new(root: Rc<RefCell<Node>>, name: String, camera: Rc<RefCell<CameraNode>>) -> Scene {
+        Scene {
+            root: root,
+            name: name,
+            mainCamera: camera,
+        }
+    }
+
     fn add_root(&mut self, node: Rc<RefCell<Node>>) {
         self.root = Rc::clone(&node);
     }
