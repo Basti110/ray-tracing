@@ -5,3 +5,5 @@ authors = ["Sebastian Preuß <sebastian.preuss@rwth-aachen.de>"]
 edition = "2018"
 
 [dependencies]
+image = "*"
+cgmath = "0.16.1"
