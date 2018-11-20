@@ -26,10 +26,20 @@ impl Color {
 }
 
 pub struct Scene {
-    root: RefCell<Vec<Rc<Node>>>,
+    root: Rc<RefCell<Node>>,
     pub name: String,
-    pub mainCamera: RefCell<Rc<CameraNode>>,
+    pub mainCamera: Rc<RefCell<CameraNode>>,
     //pub renderer: RenderSystem,
+}
+
+impl Scene {
+    fn add_root(&mut self, node: Rc<RefCell<Node>>) {
+        self.root = Rc::clone(&node);
+    }
+
+    fn add_camera(&mut self, camera: Rc<RefCell<CameraNode>>) {
+        self.mainCamera = Rc::clone(&camera);
+    }
 }
 
 pub struct SphereNode {
@@ -145,7 +155,7 @@ impl Ray {
 }
 
 trait Node {
-    //fn get_parent(&self) -> Node;
+    fn get_parent(&self) -> Option<Rc<RefCell<Node>>>;
     fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>>;
     fn add_child(&mut self, node: Rc<RefCell<Node>>);
     fn get_size(&self) -> usize;
@@ -155,6 +165,15 @@ macro_rules! impl_T {
     (for $($t:ty),+) => {
         $(
             impl Node for $t {
+                fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
+                    let strong = &self.parent.upgrade();
+                    let strong = match strong {
+                        Some(x) => x,
+                        None => return None,
+                    };
+                    return Some(Rc::clone(&(*strong))); //Some(Rc::clone(&(*(&self.parent))));
+                }
+
                 fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>> {
                     if index >= self.size {
                         return None;
