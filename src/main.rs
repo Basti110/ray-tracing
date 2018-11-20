@@ -11,8 +11,8 @@ fn main() {
         "main_camera".to_string(),
         Matrix4::from_translation(Vector3::new(0.0, 0.0, 0.0)),
         Vector3::new(0.0, 0.0, -1.0),
-        1080,
-        720
+        800,
+        600
     )));
 
     let root = Rc::new(RefCell::new(Node3D::new(
@@ -32,8 +32,6 @@ fn main() {
         1.0,
         Color::new(0.0, 255.0, 0.0)
     )));
-
-    let test = (*(*root).borrow_mut()).add_child(sphere);
 
     //------------ Render Scene ---------------
     

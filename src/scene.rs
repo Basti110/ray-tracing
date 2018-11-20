@@ -299,7 +299,7 @@ impl Node for SphereNode {
 
     fn intersect(&self, ray: &Ray) -> bool {
         let origin = Vector3::new(ray.origin.x, ray.origin.y, ray.origin.z);
-        let l = origin - self.frame_transform.row(3).truncate();
+        let l = origin - self.frame_transform.w.truncate();
         let adj2 = l.dot(ray.direction);
         let d2 = l.dot(l) - (adj2 * adj2);
 
