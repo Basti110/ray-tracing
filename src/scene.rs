@@ -29,25 +29,30 @@ pub struct Scene {
     root: Rc<RefCell<Node>>,
     pub name: String,
     pub mainCamera: Rc<RefCell<CameraNode>>,
-    //pub renderer: RenderSystem,
+    pub renderer: Rc<RefCell<RenderSystem>>,
 }
 
 impl Scene {
-    fn new(root: Rc<RefCell<Node>>, name: String, camera: Rc<RefCell<CameraNode>>) -> Scene {
+    pub fn new(name: String, root: Rc<RefCell<Node>>, camera: Rc<RefCell<CameraNode>>) -> Scene {
         Scene {
             root: root,
             name: name,
             mainCamera: camera,
+            renderer: Rc::new(RefCell::new(RenderSystem {})),
         }
     }
 
-    fn add_root(&mut self, node: Rc<RefCell<Node>>) {
+    pub fn add_root(&mut self, node: Rc<RefCell<Node>>) {
         self.root = Rc::clone(&node);
     }
 
-    fn add_camera(&mut self, camera: Rc<RefCell<CameraNode>>) {
+    pub fn add_camera(&mut self, camera: Rc<RefCell<CameraNode>>) {
         self.mainCamera = Rc::clone(&camera);
     }
+}
+
+pub struct RenderSystem {
+
 }
 
 pub struct SphereNode {
@@ -101,7 +106,7 @@ pub struct CameraNode {
 }
 
 impl CameraNode {
-    pub fn new(name: String, transform: Matrix4<f64>, direction: Vector3<f64>, plane: Vector3<f64>, width: usize, height: usize) -> CameraNode {
+    pub fn new(name: String, transform: Matrix4<f64>, direction: Vector3<f64>, width: usize, height: usize) -> CameraNode {
         CameraNode {
             childs: vec![],
             parent: Weak::new(),
@@ -109,7 +114,7 @@ impl CameraNode {
             name: name,
             frame_transform: transform,
             viewing_direction: direction,
-            plane_point: plane,
+            plane_point: Vector3::new(0.0, 0.0, 0.0),
             image_width: width,
             image_height: height,
             plane_with: 0.0,
@@ -162,7 +167,7 @@ impl Ray {
     }
 }
 
-trait Node {
+pub trait Node {
     fn get_parent(&self) -> Option<Rc<RefCell<Node>>>;
     fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>>;
     fn add_child(&mut self, node: Rc<RefCell<Node>>);
