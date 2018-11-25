@@ -1,6 +1,19 @@
-mod scene;
+pub mod node;
+pub mod sphere_node;
+pub mod camera_node;
+pub mod node_3d;
+pub mod scene;
+pub mod scene_items;
+pub mod render_system;
+
 extern crate cgmath;
-use self::scene::{Scene, CameraNode, Node3D, SphereNode, Color, Node, RenderSystem};
+use self::scene::Scene;
+use self::camera_node::CameraNode; 
+use self::node_3d::Node3D;
+use self::sphere_node::SphereNode;
+use self::scene_items::{Color, Ray};
+use self::node::Node; 
+use self::render_system::RenderSystem;
 use cgmath::{Point3, Vector3, Matrix4};
 use std::rc::{Weak, Rc};
 use std::cell::RefCell;
@@ -33,11 +46,13 @@ fn main() {
         Color::new(0.0, 255.0, 0.0)
     )));
 
+    (*root).borrow_mut().add_child(sphere);
     //------------ Render Scene ---------------
     
     let renderer = RenderSystem {
         output_path: "output.png".to_string()
     };
-    
+
+    println!("Render!");
     renderer.render(&scene, camera);
 }   
