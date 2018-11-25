@@ -2,12 +2,8 @@ extern crate image;
 extern crate cgmath;
 
 use crate::{CameraNode, Node, RenderSystem};
-use image::ImageFormat;
-use image::{DynamicImage, GenericImage, Pixel, ImageBuffer, Rgba};
-use cgmath::{Matrix, VectorSpace, InnerSpace, Point3, Vector3, Matrix4};
-use std::rc::{Rc, Weak};
+use std::rc::{Rc};
 use std::cell::RefCell;
-use std::fs::{File, OpenOptions};
 
 //const viewing_direction: Vector3<f64> = Vector3::new(0.0, 0.0, -1.0);     // Viewing direction (world coordinates)
 //const start_point: Vector3<f64> = Vector3::new(0.0, 0.0, -1.0);          // Center of the Image Plane (world coordinates)
@@ -17,7 +13,7 @@ use std::fs::{File, OpenOptions};
 pub struct Scene {
     pub root: Rc<RefCell<Node>>,
     pub name: String,
-    pub mainCamera: Rc<RefCell<CameraNode>>,
+    //pub mainCamera: Rc<RefCell<CameraNode>>,
     pub renderer: Rc<RefCell<RenderSystem>>,
 }
 
@@ -26,7 +22,7 @@ impl Scene {
         Scene {
             root: root,
             name: name,
-            mainCamera: camera,
+            //mainCamera: camera,
             renderer: Rc::new(RefCell::new(RenderSystem {output_path: "output.png".to_string()})),
         }
     }
@@ -35,9 +31,9 @@ impl Scene {
         self.root = Rc::clone(&node);
     }
 
-    pub fn add_camera(&mut self, camera: Rc<RefCell<CameraNode>>) {
-        self.mainCamera = Rc::clone(&camera);
-    }
+    // pub fn add_camera(&mut self, camera: Rc<RefCell<CameraNode>>) {
+    //     self.mainCamera = Rc::clone(&camera);
+    // }
 
     pub fn get_renderer(&self) -> Rc<RefCell<RenderSystem>> {
         return Rc::clone(&self.renderer);
