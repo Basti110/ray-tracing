@@ -69,9 +69,9 @@ impl Node for SphereNode {
         let t0 = adj - thc;
         let t1 = adj + thc;
 
-        if t0 < 0.0 && t1 < 0.0 {
-            return None;
-        }
+        // if t0 < 0.0 && t1 < 0.0 {
+        //     return None;
+        // }
 
         let distance = if t0 < t1 { t0 } else { t1 };
         
