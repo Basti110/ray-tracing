@@ -77,4 +77,8 @@ impl Node for SphereNode {
         
         Some(distance)
     }
+
+    fn get_color(&self) -> Color {
+        return self.color.copy();
+    }
 }

@@ -1,4 +1,4 @@
-use crate::{Node3D, Node, Ray};
+use crate::{Node3D, Node, Ray, Color};
 use std::rc::{Weak, Rc};
 use cgmath::{Vector3, Matrix4};
 use std::cell::RefCell;
@@ -64,5 +64,9 @@ impl Node for CameraNode {
 
     fn intersect(&self, ray: &Ray) -> Option<f64> {
         return None;
+    }
+
+    fn get_color(&self) -> Color {
+        return Color::new(0.0, 0.0, 0.0);
     }
 }

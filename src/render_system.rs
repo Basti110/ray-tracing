@@ -1,4 +1,4 @@
-use crate::{Scene, CameraNode, Node, Ray};
+use crate::{Scene, CameraNode, Node, Ray, Color};
 use std::rc::{Rc};
 use std::cell::RefCell;
 use image::{DynamicImage, GenericImage, Pixel, Rgba, ImageFormat};
@@ -19,7 +19,7 @@ impl RenderSystem {
         for x in 0..width {
             for y in 0..height {
                 let ray = Ray::create_prime(x, y, width, height);
-                let black = Rgba::from_channels(0, 0, 0, 0);
+                let back = Rgba::from_channels(135, 206, 255, 0);
 
                 //****************** IMPORTANT ********************************
                 //Only works with the current implemented scene in main.rs*****
@@ -30,8 +30,11 @@ impl RenderSystem {
                 // }
                 let root = Rc::clone(&scene.root);
                 match RenderSystem::get_intersection_obj(&ray, root) {
-                    None => image.put_pixel(x, y, black),
-                    Some(a) => image.put_pixel(x, y, Rgba::from_channels(0, 255, 0, 0)),
+                    None => image.put_pixel(x, y, back),
+                    Some(a) => {
+                        let c = value!(a.obj).get_color();
+                        image.put_pixel(x, y, Rgba::from_channels(c.red as u8, c.green as u8, c.blue as u8, 0))
+                    },
                 };
             }
         }

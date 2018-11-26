@@ -1,4 +1,4 @@
-use crate::{Node, Ray};
+use crate::{Node, Ray, Color};
 use std::rc::{Weak, Rc};
 use cgmath::{Matrix4};
 use std::cell::RefCell;
@@ -61,5 +61,9 @@ impl Node for Node3D {
 
     fn intersect(&self, ray: &Ray) -> Option<f64> {
         return None;
+    }
+
+    fn get_color(&self) -> Color {
+        return Color::new(0.0, 0.0, 0.0);
     }
 }
