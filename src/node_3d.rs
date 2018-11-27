@@ -1,6 +1,6 @@
 use crate::{Node, Ray, Color};
 use std::rc::{Weak, Rc};
-use cgmath::{Matrix4};
+use cgmath::{Matrix4, Vector3};
 use std::cell::RefCell;
 
 pub struct Node3D {
@@ -59,7 +59,7 @@ impl Node for Node3D {
         return self.size;
     }
 
-    fn intersect(&self, ray: &Ray) -> Option<f64> {
+    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         return None;
     }
 

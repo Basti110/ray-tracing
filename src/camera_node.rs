@@ -62,7 +62,7 @@ impl Node for CameraNode {
         return self.size;
     }
 
-    fn intersect(&self, ray: &Ray) -> Option<f64> {
+    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         return None;
     }
 

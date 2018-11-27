@@ -1,9 +1,10 @@
-use crate::{Scene, CameraNode, Node, Ray, Color};
+use crate::{Scene, CameraNode, Node, Ray, Color, Light};
 use std::rc::{Rc};
 use std::cell::RefCell;
 use image::{DynamicImage, GenericImage, Pixel, Rgba, ImageFormat};
 use std::fs::{OpenOptions};
 use std::f64;
+use cgmath::{InnerSpace, Vector3};
 
 pub struct RenderSystem {
     pub output_path: String,
@@ -32,8 +33,8 @@ impl RenderSystem {
                 match RenderSystem::get_intersection_obj(&ray, root) {
                     None => image.put_pixel(x, y, back),
                     Some(a) => {
-                        let c = value!(a.obj).get_color();
-                        image.put_pixel(x, y, Rgba::from_channels(c.red as u8, c.green as u8, c.blue as u8, 0))
+                        let c = RenderSystem::get_color(&scene, &ray, &a);
+                        image.put_pixel(x, y, Rgba::from_channels(c.red(), c.green(), c.blue(), 0))
                     },
                 };
             }
@@ -71,22 +72,42 @@ impl RenderSystem {
             };
         }
 
-        let distance = match value!(node).intersect(&ray) {
-            None => cur_distance,
-            Some(x) => x
+        let intersect = match value!(node).intersect(&ray) {
+            None => return cur_obj,
+            Some(x) => (x.0, x.1)
         };
 
-        if distance < cur_distance {
+        if intersect.0 < cur_distance {
             cur_obj = Some(IntersectionObject {
-                distance: distance,
+                distance: intersect.0,
                 obj: Rc::clone(&node),
+                normal: intersect.1,
             });
         }
         return cur_obj;
+    }
+
+    fn get_color(scene: &Scene, ray: &Ray, intersection: &IntersectionObject) -> Color {
+        //let hit_point = ray.origin + (ray.direction * intersection.distance);
+        //let surface_normal = intersection.element.surface_normal(&hit_point);
+        let direction_to_light = -value!(scene.lights).direction.normalize();
+        let light_power = (intersection.normal.dot(direction_to_light) as f32);
+        //println!("{}", light_power);
+        //let light_power = (light_power).max(0.0);
+        //println!("{}", light_power);
+        let light_power = (light_power).max(0.0) * value!(scene.lights).intensity;
+        //
+        
+        let light_reflected = 1.0 / std::f32::consts::PI;
+        //println!("{}", light_power);
+
+        let color = value!(intersection.obj).get_color().copy() * value!(scene.lights).color.copy() * light_power * light_reflected;
+        color.clamp()
     }
 }
 
 struct IntersectionObject {
     pub distance: f64,
     pub obj: Rc<RefCell<Node>>,
+    pub normal: Vector3<f64>,
 }

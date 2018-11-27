@@ -1,5 +1,6 @@
 use cgmath::{InnerSpace, Vector3, Point3};
 use image::{Pixel, Rgba};
+use std::ops::{Mul};
 
 pub struct Color {
     pub red: f32,
@@ -16,15 +17,67 @@ impl Color {
         }
     }
 
+    pub fn new_rgb(r: u8, g: u8, b: u8) -> Color {
+        Color {
+            red: (r as f32)  / 255.0,
+            green: (g as f32) / 255.0,
+            blue: (b as f32) / 255.0,
+        }
+    }
+
+    pub fn clamp(&self) -> Color {
+        Color {
+            red: self.red.min(1.0).max(0.0),
+            blue: self.blue.min(1.0).max(0.0),
+            green: self.green.min(1.0).max(0.0),
+        }
+    }
+
     pub fn to_rgba(&self) -> Rgba<u8> {
-        Rgba::from_channels(self.red as u8,
-                        self.green as u8,
-                        self.blue as u8,
+        Rgba::from_channels((self.red * 255.0) as u8,
+                        (self.green * 255.0) as u8,
+                        (self.blue * 255.0) as u8,
                         255)
     }
 
     pub fn copy(&self) -> Color {
         return Color::new(self.red, self.green, self.blue);
+    }
+
+    pub fn red(&self) -> u8 {
+        return (self.red * 255.0) as u8;
+    }
+    
+    pub fn green(&self) -> u8 {
+        return (self.green * 255.0) as u8;
+    }
+    
+    pub fn blue(&self) -> u8 {
+        return (self.blue * 255.0) as u8;
+    }
+}
+
+impl Mul for Color {
+    type Output = Color;
+
+    fn mul(self, other: Color) -> Color {
+        Color {
+            red: self.red * other.red,
+            blue: self.blue * other.blue,
+            green: self.green * other.green,
+        }
+    }
+}
+
+impl Mul<f32> for Color {
+    type Output = Color;
+
+    fn mul(self, other: f32) -> Color {
+        Color {
+            red: self.red * other,
+            blue: self.blue * other,
+            green: self.green * other,
+        }
     }
 }
 

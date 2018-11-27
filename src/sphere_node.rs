@@ -54,7 +54,7 @@ impl Node for SphereNode {
         return self.size;
     }
 
-    fn intersect(&self, ray: &Ray) -> Option<f64> {
+    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         let origin = Vector3::new(ray.origin.x, ray.origin.y, ray.origin.z);
         let l = origin - self.frame_transform.w.truncate();
 
@@ -74,8 +74,11 @@ impl Node for SphereNode {
         // }
 
         let distance = if t0 < t1 { t0 } else { t1 };
+        let hit_point = ray.origin + (ray.direction * -distance);
+        let normal = hit_point - self.frame_transform.w.truncate();
+        let normal = Vector3::new(normal.x, normal.y, normal.z).normalize();
         
-        Some(distance)
+        Some((distance, normal))
     }
 
     fn get_color(&self) -> Color {
