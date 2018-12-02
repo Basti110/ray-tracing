@@ -8,9 +8,11 @@ pub mod scene;
 pub mod scene_items;
 pub mod render_system;
 pub mod light;
+pub mod plane;
 
 //use self::utils::Utils;
 extern crate cgmath;
+use self::plane::Plane;
 use self::scene::Scene;
 use self::camera_node::CameraNode; 
 use self::node_3d::Node3D;
@@ -47,21 +49,21 @@ fn main() {
 
     let sphere1 = Rc::new(RefCell::new(SphereNode::new(
         "Sphere 1".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, 0.0, -5.0)),
+        Matrix4::from_translation(Vector3::new(4.0, 0.0, -5.0)),
         1.0,
         Color::new_rgb(51, 255, 51)
     )));
 
     let sphere2 = Rc::new(RefCell::new(SphereNode::new(
         "Sphere 2".to_string(),
-        Matrix4::from_translation(Vector3::new(-3.0, 1.0, -6.0)),
+        Matrix4::from_translation(Vector3::new(-4.0, 1.0, -7.0)),
         1.5,
         Color::new_rgb(255, 51, 51)
     )));
 
     let sphere3 = Rc::new(RefCell::new(SphereNode::new(
         "Sphere 3".to_string(),
-        Matrix4::from_translation(Vector3::new(2.0, 1.0, -4.0)),
+        Matrix4::from_translation(Vector3::new(0.0, 1.0, -7.0)),
         2.0,
         Color::new_rgb(51, 51, 255)
     )));
@@ -74,15 +76,27 @@ fn main() {
     value!(sphere_root).add_child(sphere1);
     value!(sphere_root).add_child(sphere2);
     value!(sphere_root).add_child(sphere3);
+    
     value!(root).add_child(sphere_root);
+
+    //----------- Add Plane -------------------
+
+    let plane = Rc::new(RefCell::new(Plane::new(
+        "Plane".to_string(),
+        Matrix4::from_translation(Vector3::new(2.0, -2.0, -5.0)),
+        Point3::new(2.0, -2.0, -5.0),
+        Vector3::new(0.0, -1.0, 0.0),
+        Color::new_rgb(160, 160, 160)
+    )));
+    value!(root).add_child(plane);
     
     //----------- Add Light to Scene ----------
     let light = Rc::new(RefCell::new(Light::new(
         "Light".to_string(),
         Matrix4::from_translation(Vector3::new(2.0, 1.0, -4.0)),
-        Vector3::new(0.0, -1.0, 2.0),
+        Vector3::new(0.0, -1.0, -1.0),
         Color::new_rgb(255, 255, 255),
-        5.0
+        1.0
     )));
 
     scene.lights = Rc::clone(&light);

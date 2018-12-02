@@ -66,18 +66,18 @@ impl Node for SphereNode {
         }
 
         let thc = (radius2 - d2).sqrt();
-        let t0 = adj - thc;
-        let t1 = adj + thc;
+        let t0 = (adj - thc) * -1.0;
+        let t1 = (adj + thc) * -1.0;
 
-        // if t0 < 0.0 && t1 < 0.0 {
-        //     return None;
-        // }
+        if t0 < 0.0 && t1 < 0.0 {
+              return None;
+        }
 
         let distance = if t0 < t1 { t0 } else { t1 };
-        let hit_point = ray.origin + (ray.direction * -distance);
+        let hit_point = ray.origin + (ray.direction * distance);
         let normal = hit_point - self.frame_transform.w.truncate();
-        let normal = Vector3::new(normal.x, normal.y, normal.z).normalize();
-        
+        let normal = -Vector3::new(normal.x, normal.y, normal.z).normalize();
+        //println!("{}: {}", self.name, distance);
         Some((distance, normal))
     }
 
