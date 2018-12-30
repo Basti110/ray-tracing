@@ -9,6 +9,7 @@ pub struct Node3D {
     size: usize,
     pub name: String,
     pub frame_transform: Matrix4<f64>,
+    pub world_transform: Matrix4<f64>,
 }
 
 impl Node3D {
@@ -19,6 +20,7 @@ impl Node3D {
             size: 0,
             name: name,
             frame_transform: transform,
+            world_transform: transform,
         }
     }
 
@@ -29,6 +31,7 @@ impl Node3D {
             size: 0,
             name: "".to_string(),
             frame_transform: Matrix4::from_scale(0.0),
+            world_transform: Matrix4::from_scale(0.0),
         }
     }
 }
@@ -65,5 +68,13 @@ impl Node for Node3D {
 
     fn get_color(&self) -> Color {
         return Color::new(0.0, 0.0, 0.0);
+    }
+
+    fn get_world_transform(&self) -> Matrix4<f64> {
+        return self.world_transform;
+    }
+
+    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
+        self.world_transform = transform;
     }
 }

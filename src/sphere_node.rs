@@ -9,6 +9,7 @@ pub struct SphereNode {
     size: usize,
     pub name: String,
     pub frame_transform: Matrix4<f64>,
+    pub world_transform: Matrix4<f64>,
     //pub center: Point3<f64>,
     pub radius: f64,
     pub color: Color,
@@ -22,6 +23,7 @@ impl SphereNode {
             size: 0,
             name: name,
             frame_transform: transform,
+            world_transform: transform,
             radius: radius,
             color: color,
         }
@@ -83,5 +85,13 @@ impl Node for SphereNode {
 
     fn get_color(&self) -> Color {
         return self.color.copy();
+    }
+
+    fn get_world_transform(&self) -> Matrix4<f64> {
+        return self.world_transform;
+    }
+
+    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
+        self.world_transform = transform;
     }
 }

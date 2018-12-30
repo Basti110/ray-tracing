@@ -83,8 +83,8 @@ fn main() {
 
     let plane = Rc::new(RefCell::new(Plane::new(
         "Plane".to_string(),
-        Matrix4::from_translation(Vector3::new(2.0, -2.0, -5.0)),
-        Point3::new(2.0, -2.0, -5.0),
+        Matrix4::from_translation(Vector3::new(0.0, -2.0, -5.0)),
+        Point3::new(0.0, -2.0, -5.0),
         Vector3::new(0.0, -1.0, 0.0),
         Color::new_rgb(160, 160, 160)
     )));

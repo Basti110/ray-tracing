@@ -10,6 +10,7 @@ pub struct CameraNode {
     pub name: String,
     //center: Point3<f64>,
     pub frame_transform: Matrix4<f64>,
+    pub world_transform: Matrix4<f64>,
     pub viewing_direction: Vector3<f64>,
     pub plane_point: Vector3<f64>,          
     pub image_width: usize,
@@ -26,6 +27,7 @@ impl CameraNode {
             size: 0,
             name: name,
             frame_transform: transform,
+            world_transform: transform,
             viewing_direction: direction,
             plane_point: Vector3::new(0.0, 0.0, 0.0),
             image_width: width,
@@ -68,5 +70,13 @@ impl Node for CameraNode {
 
     fn get_color(&self) -> Color {
         return Color::new(0.0, 0.0, 0.0);
+    }
+
+    fn get_world_transform(&self) -> Matrix4<f64> {
+        return self.world_transform;
+    }
+
+    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
+        self.world_transform = transform;
     }
 }

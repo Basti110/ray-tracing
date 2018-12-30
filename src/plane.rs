@@ -9,6 +9,7 @@ pub struct Plane {
     size: usize,
     pub name: String,
     pub frame_transform: Matrix4<f64>,
+    pub world_transform: Matrix4<f64>,
     pub origin: Point3<f64>,
     pub normal: Vector3<f64>,
     pub color: Color,
@@ -22,6 +23,7 @@ impl Plane {
             size: 0,
             name: name,
             frame_transform: transform,
+            world_transform: transform,
             origin: origin,
             normal: normal,
             color: color,
@@ -65,7 +67,7 @@ impl Node for Plane {
                 let hit_point = ray.origin + (ray.direction * distance);
                 let l = hit_point.to_vec() - self.origin.to_vec();
                 //let l = l.magnitude();
-                if l.x < 4.0 && l.y < 4.0 && l.z < 4.0 {
+                if l.x.abs() < 6.0 && l.y.abs() < 6.0 && l.z.abs() < 6.0 {
                     return Some((distance, normal));
                 }
             }
@@ -76,4 +78,12 @@ impl Node for Plane {
     fn get_color(&self) -> Color {
         return self.color.copy();
     }
+
+    fn get_world_transform(&self) -> Matrix4<f64> {
+        return self.world_transform;
+    }
+
+    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
+        self.world_transform = transform;
+    }    
 }
