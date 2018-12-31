@@ -1,4 +1,4 @@
-use crate::{Scene, CameraNode, Node, Ray, Color, Light};
+use crate::{Scene, CameraNode, Node, Ray, Color, DirectionalLight};
 use std::rc::{Rc};
 use std::cell::RefCell;
 use image::{DynamicImage, GenericImage, Pixel, Rgba, ImageFormat};

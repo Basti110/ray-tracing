@@ -11,5 +11,5 @@ pub trait Node {
     fn get_size(&self) -> usize;
     fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)>;
     fn get_world_transform(&self) -> Matrix4<f64>;
-    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> ();
+    fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> ();
 }

@@ -49,6 +49,7 @@ impl Node for SphereNode {
 
     fn add_child(&mut self, node: Rc<RefCell<Node>>) {
         self.size += 1;
+        value!(node).set_world_transform(&self.world_transform);
         self.childs.push(Rc::clone(&node));
     }
 
@@ -58,7 +59,7 @@ impl Node for SphereNode {
 
     fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         let origin = Vector3::new(ray.origin.x, ray.origin.y, ray.origin.z);
-        let l = origin - self.frame_transform.w.truncate();
+        let l = origin - self.world_transform.w.truncate();
 
         let adj = l.dot(ray.direction);
         let d2 = l.dot(l) - (adj * adj);
@@ -77,7 +78,7 @@ impl Node for SphereNode {
 
         let distance = if t0 < t1 { t0 } else { t1 };
         let hit_point = ray.origin + (ray.direction * distance);
-        let normal = hit_point - self.frame_transform.w.truncate();
+        let normal = hit_point - self.world_transform.w.truncate();
         let normal = -Vector3::new(normal.x, normal.y, normal.z).normalize();
         //println!("{}: {}", self.name, distance);
         Some((distance, normal))
@@ -91,7 +92,7 @@ impl Node for SphereNode {
         return self.world_transform;
     }
 
-    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
-        self.world_transform = transform;
+    fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
+        self.world_transform = transform * self.frame_transform;
     }
 }

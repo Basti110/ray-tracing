@@ -1,9 +1,9 @@
 use crate::{Node, Ray, Color};
 use std::rc::{Weak, Rc};
-use cgmath::{Matrix4, Vector3};
+use cgmath::{Matrix4, Vector3, Point3};
 use std::cell::RefCell;
 
-pub struct Light {
+pub struct DirectionalLight  {
     childs: Vec<Rc<RefCell<Node>>>,
     parent: Weak<Rc<RefCell<Node>>>,
     size: usize,
@@ -15,9 +15,59 @@ pub struct Light {
     pub intensity: f32,
 }
 
+pub struct SphericalLight {
+    childs: Vec<Rc<RefCell<Node>>>,
+    parent: Weak<Rc<RefCell<Node>>>,
+    size: usize,
+    pub name: String,
+    pub frame_transform: Matrix4<f64>,
+    pub world_transform: Matrix4<f64>,
+    pub direction: Vector3<f64>,
+    pub color: Color,
+    pub intensity: f32,
+}
+
+pub enum Light {
+    Directional(DirectionalLight),
+    Spherical(SphericalLight),
+}
+
 impl Light {
-    pub fn new(name: String, transform: Matrix4<f64>, direction: Vector3<f64>, color: Color, intensity: f32) -> Light {
-        Light {
+    pub fn color(&self) -> Color {
+        match *self {
+            Light::Directional(ref d) => d.color,
+            Light::Spherical(ref s) => s.color,
+        }
+    }
+
+    pub fn direction_from(&self, hit_point: &Point3<f64>) -> Vector3<f64> {
+        match *self {
+            Light::Directional(ref d) => -d.direction,
+            Light::Spherical(ref s) => (s.position - *hit_point).normalize(),
+        }
+    }
+
+    pub fn intensity(&self, hit_point: &Point3<f64>) -> f32 {
+        match *self {
+            Light::Directional(ref d) => d.intensity,
+            Light::Spherical(ref s) => {
+                let r2 = (s.position - *hit_point).norm() as f32;
+                s.intensity / (4.0 * ::std::f32::consts::PI * r2)
+            }
+        }
+    }
+
+    pub fn distance(&self, hit_point: &Point) -> f64 {
+        match *self {
+            Light::Directional(_) => ::std::f64::INFINITY,
+            Light::Spherical(ref s) => (s.position - *hit_point).length(),
+        }
+    }
+}
+
+impl DirectionalLight {
+    pub fn new(name: String, transform: Matrix4<f64>, direction: Vector3<f64>, color: Color, intensity: f32) -> DirectionalLight {
+        DirectionalLight {
             childs: vec![],
             parent: Weak::new(),
             size: 0,
@@ -30,8 +80,8 @@ impl Light {
         }
     }
 
-    pub fn off_light() -> Light {
-        Light {
+    pub fn off_light() -> DirectionalLight {
+        DirectionalLight {
             childs: vec![],
             parent: Weak::new(),
             size: 0,
@@ -64,6 +114,7 @@ impl Node for Light {
 
     fn add_child(&mut self, node: Rc<RefCell<Node>>) {
         self.size += 1;
+        value!(node).set_world_transform(&self.world_transform);
         self.childs.push(Rc::clone(&node));
     }
 
@@ -83,7 +134,7 @@ impl Node for Light {
         return self.world_transform;
     }
 
-    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
-        self.world_transform = transform;
+    fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
+        self.world_transform = transform * self.frame_transform;
     }
 }

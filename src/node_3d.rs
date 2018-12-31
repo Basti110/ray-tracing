@@ -55,6 +55,7 @@ impl Node for Node3D {
 
     fn add_child(&mut self, node: Rc<RefCell<Node>>) {
         self.size += 1;
+        value!(node).set_world_transform(&self.world_transform);
         self.childs.push(Rc::clone(&node));
     }
 
@@ -74,7 +75,7 @@ impl Node for Node3D {
         return self.world_transform;
     }
 
-    fn set_world_transform(&mut self, transform: Matrix4<f64>) -> () {
-        self.world_transform = transform;
+    fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
+        self.world_transform = transform * self.frame_transform;
     }
 }
