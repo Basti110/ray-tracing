@@ -1,6 +1,6 @@
 use crate::{Node, Ray, Color};
 use std::rc::{Weak, Rc};
-use cgmath::{Matrix4, Vector3, Point3};
+use cgmath::{Matrix4, Vector3, Point3, EuclideanSpace, InnerSpace, MetricSpace};
 use std::cell::RefCell;
 
 pub struct DirectionalLight  {
@@ -22,7 +22,6 @@ pub struct SphericalLight {
     pub name: String,
     pub frame_transform: Matrix4<f64>,
     pub world_transform: Matrix4<f64>,
-    pub direction: Vector3<f64>,
     pub color: Color,
     pub intensity: f32,
 }
@@ -35,15 +34,15 @@ pub enum Light {
 impl Light {
     pub fn color(&self) -> Color {
         match *self {
-            Light::Directional(ref d) => d.color,
-            Light::Spherical(ref s) => s.color,
+            Light::Directional(ref d) => Color::new(d.color.red, d.color.green, d.color.blue),
+            Light::Spherical(ref s) => Color::new(s.color.red, s.color.green, s.color.blue),
         }
     }
 
     pub fn direction_from(&self, hit_point: &Point3<f64>) -> Vector3<f64> {
         match *self {
-            Light::Directional(ref d) => -d.direction,
-            Light::Spherical(ref s) => (s.position - *hit_point).normalize(),
+            Light::Directional(ref d) => d.direction,
+            Light::Spherical(ref s) => -(Point3::from_vec(s.world_transform.w.truncate()) - *hit_point).normalize(),
         }
     }
 
@@ -51,16 +50,16 @@ impl Light {
         match *self {
             Light::Directional(ref d) => d.intensity,
             Light::Spherical(ref s) => {
-                let r2 = (s.position - *hit_point).norm() as f32;
+                let r2 = Point3::from_vec(s.world_transform.w.truncate()).distance(*hit_point) as f32;
                 s.intensity / (4.0 * ::std::f32::consts::PI * r2)
             }
         }
     }
 
-    pub fn distance(&self, hit_point: &Point) -> f64 {
+    pub fn distance(&self, hit_point: &Point3<f64>) -> f64 {
         match *self {
             Light::Directional(_) => ::std::f64::INFINITY,
-            Light::Spherical(ref s) => (s.position - *hit_point).length(),
+            Light::Spherical(ref s) => Point3::from_vec(s.world_transform.w.truncate()).distance(*hit_point),
         }
     }
 }
@@ -95,7 +94,66 @@ impl DirectionalLight {
     }
 }
 
-impl Node for Light {
+impl Node for DirectionalLight {
+    fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
+        let strong = &self.parent.upgrade();
+        let strong = match strong {
+            Some(x) => x,
+            None => return None,
+        };
+        return Some(Rc::clone(&(*strong))); //Some(Rc::clone(&(*(&self.parent))));
+    }
+
+    fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>> {
+        if index >= self.size {
+            return None;
+        }
+        return Some(Rc::clone(&(self.childs[index])));
+    }
+
+    fn add_child(&mut self, node: Rc<RefCell<Node>>) {
+        self.size += 1;
+        value!(node).set_world_transform(&self.world_transform);
+        self.childs.push(Rc::clone(&node));
+    }
+
+    fn get_size(&self) -> usize {
+        return self.size;
+    }
+
+    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
+        return None;
+    }
+
+    fn get_color(&self) -> Color {
+        return self.color.copy();
+    }
+
+    fn get_world_transform(&self) -> Matrix4<f64> {
+        return self.world_transform;
+    }
+
+    fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
+        self.world_transform = transform * self.frame_transform;
+    }
+}
+
+impl SphericalLight {
+    pub fn new(name: String, transform: Matrix4<f64>, color: Color, intensity: f32) -> SphericalLight {
+        SphericalLight {
+            childs: vec![],
+            parent: Weak::new(),
+            size: 0,
+            name: name,
+            frame_transform: transform,
+            world_transform: transform,
+            color: color,
+            intensity: intensity,
+        }
+    }
+}
+
+impl Node for SphericalLight {
     fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
         let strong = &self.parent.upgrade();
         let strong = match strong {

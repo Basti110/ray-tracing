@@ -20,7 +20,7 @@ use self::sphere_node::SphereNode;
 use self::scene_items::{Color, Ray};
 use self::node::Node; 
 use self::render_system::RenderSystem;
-use self::light::DirectionalLight;
+use self::light::{DirectionalLight, SphericalLight, Light};
 
 use cgmath::{Point3, Vector3, Matrix4, Deg};
 use std::rc::{Weak, Rc};
@@ -83,24 +83,62 @@ fn main() {
     //let rad = Deg(180.0);
     //let s = Matrix4::from_scale(1.0);
     let r = Matrix4::from_angle_x(Deg(-90.0));
-    let t = Matrix4::from_translation(Vector3::new(0.0, -2.0, -5.0));
-    let plane = Rc::new(RefCell::new(Plane::new(
-        "Plane".to_string(),
+    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -12.0));
+    let plane1 = Rc::new(RefCell::new(Plane::new(
+        "Plane 1".to_string(),
         t*r,
         Color::new_rgb(160, 160, 160)
     )));
-    value!(sphere_root).add_child(plane);
-    value!(root).add_child(sphere_root);
-    //----------- Add Light to Scene ----------
-    let light = Rc::new(RefCell::new(DirectionalLight::new(
-        "Light".to_string(),
-        Matrix4::from_translation(Vector3::new(2.0, 1.0, -4.0)),
-        Vector3::new(0.0, -1.0, -1.0),
-        Color::new_rgb(255, 255, 255),
-        1.0
+
+    let r = Matrix4::from_angle_z(Deg(-90.0));
+    let t = Matrix4::from_translation(Vector3::new(6.0, 0.0, -6.0));
+    let plane2 = Rc::new(RefCell::new(Plane::new(
+        "Plane 2".to_string(),
+        t*r,
+        Color::new_rgb(128, 255, 128)
     )));
 
+    let r = Matrix4::from_angle_z(Deg(90.0));
+    let t = Matrix4::from_translation(Vector3::new(-6.0, 0.0, -6.0));
+    let plane3 = Rc::new(RefCell::new(Plane::new(
+        "Plane 3".to_string(),
+        t*r,
+        Color::new_rgb(255, 128, 128)
+    )));
+
+    let r = Matrix4::from_angle_z(Deg(0.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, -5.99, -6.0));
+    let plane4 = Rc::new(RefCell::new(Plane::new(
+        "Plane 4".to_string(),
+        t*r,
+        Color::new_rgb(128, 128, 128)
+    )));
+
+    let r = Matrix4::from_angle_z(Deg(180.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, 5.99, -6.0));
+    let plane5 = Rc::new(RefCell::new(Plane::new(
+        "Plane 5".to_string(),
+        t*r,
+        Color::new_rgb(128, 128, 128)
+    )));
+
+    value!(sphere_root).add_child(plane1);
+    value!(sphere_root).add_child(plane2);
+    value!(sphere_root).add_child(plane3);
+    value!(sphere_root).add_child(plane4);
+    value!(sphere_root).add_child(plane5);
+    
+    //----------- Add Light to Scene ----------
+    let light = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
+        "Light".to_string(),
+        Matrix4::from_translation(Vector3::new(0.0, 5.0, -11.0)),
+        Color::new_rgb(255, 255, 255),
+        90.0
+    ))));
+
     scene.lights = Rc::clone(&light);
+    //value!(sphere_root).add_child(light);
+    value!(root).add_child(sphere_root);
 
     //------------ Render Scene ---------------
     

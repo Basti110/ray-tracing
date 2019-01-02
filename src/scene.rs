@@ -1,7 +1,7 @@
 extern crate image;
 extern crate cgmath;
 
-use crate::{CameraNode, Node, RenderSystem, DirectionalLight};
+use crate::{CameraNode, Node, RenderSystem, DirectionalLight, SphericalLight, Light};
 use std::rc::{Rc};
 use std::cell::RefCell;
 
@@ -14,7 +14,7 @@ pub struct Scene {
     pub root: Rc<RefCell<Node>>,
     pub name: String,
     //pub mainCamera: Rc<RefCell<CameraNode>>,
-    pub lights: Rc<RefCell<DirectionalLight>>,
+    pub lights: Rc<RefCell<Light>>,
     pub renderer: Rc<RefCell<RenderSystem>>,
 }
 
@@ -24,7 +24,7 @@ impl Scene {
             root: root,
             name: name,
             //mainCamera: camera,
-            lights: Rc::new(RefCell::new(DirectionalLight::off_light())),
+            lights: Rc::new(RefCell::new(Light::Directional(DirectionalLight::off_light()))),
             renderer: Rc::new(RefCell::new(RenderSystem {output_path: "output.png".to_string()})),
         }
     }
