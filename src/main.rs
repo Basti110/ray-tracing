@@ -71,7 +71,7 @@ fn main() {
     
     let sphere_root = Rc::new(RefCell::new(Node3D::new(
         "Sphere root".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, 0.0, -5.0)),
+        Matrix4::from_translation(Vector3::new(0.0, 0.0, -2.0)),
     )));    
 
     value!(sphere_root).add_child(sphere1);
@@ -131,7 +131,7 @@ fn main() {
     //----------- Add Light to Scene ----------
     let light = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
         "Light".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, 5.0, -11.0)),
+        Matrix4::from_translation(Vector3::new(0.0, 5.0, -8.0)),
         Color::new_rgb(255, 255, 255),
         90.0
     ))));
