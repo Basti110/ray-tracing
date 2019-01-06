@@ -5,6 +5,7 @@ use image::{DynamicImage, GenericImage, Pixel, Rgba, ImageFormat};
 use std::fs::{OpenOptions};
 use std::f64;
 use cgmath::{InnerSpace, Vector3};
+use std::time::{Duration, Instant};
 
 pub struct RenderSystem {
     pub output_path: String,
@@ -19,6 +20,7 @@ impl RenderSystem {
         println!("Render Loop");
         for x in 0..width {
             for y in 0..height {
+                //let now = Instant::now();
                 let ray = Ray::create_prime(x, y, width, height);
                 let back = Rgba::from_channels(135, 206, 255, 0);
 
@@ -37,7 +39,8 @@ impl RenderSystem {
                         image.put_pixel(x, y, Rgba::from_channels(c.red(), c.green(), c.blue(), 0))
                     },
                 };
-
+                //let dur = now.elapsed();
+                //println!("Find Time: {}.{}.{} sek.", dur.as_secs(), dur.subsec_millis(), dur.subsec_micros());
             }
         }
 
@@ -117,16 +120,11 @@ impl RenderSystem {
         let in_light = shadow_intersection.is_none() ||
                        shadow_intersection.unwrap().distance > value!(scene.lights).distance(&hit_point);
         
-        let light_power = if in_light { 
-            light_power 
-        } 
-        else 
-        { 
-            0.0 
-        };
+        //let light_power = if in_light { light_power } else {  0.0 };
         
         //let light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) * light_intensity;
-        let color = value!(intersection.obj).get_color().copy() * value!(scene.lights).color() * light_power * light_reflected;
+        //let color = value!(intersection.obj).get_color().copy() * value!(scene.lights).color() * light_power * light_reflected;
+        let color = value!(intersection.obj).get_color().copy();
         color.clamp()
     }
 }

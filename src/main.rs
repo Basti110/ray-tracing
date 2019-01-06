@@ -32,7 +32,7 @@ fn main() {
         "main_camera".to_string(),
         Matrix4::from_translation(Vector3::new(0.0, 0.0, 0.0)),
         Vector3::new(0.0, 0.0, -1.0),
-        800,
+        600,
         600
     )));
 
@@ -48,22 +48,22 @@ fn main() {
     //-------------- Add Sphere's to Scene ------------
 
     let sphere1 = Rc::new(RefCell::new(SphereNode::new(
-        "Sphere 1".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, -0.5, -2.0)),
-        1.0,
+        "Sphere Green".to_string(),
+        Matrix4::from_translation(Vector3::new(1.0, 0.0, -4.0)),
+        0.5,
         Color::new_rgb(51, 255, 51)
     )));
 
     let sphere2 = Rc::new(RefCell::new(SphereNode::new(
-        "Sphere 2".to_string(),
-        Matrix4::from_translation(Vector3::new(-2.0, 1.0, -7.0)),
-        1.5,
+        "Sphere Red".to_string(),
+        Matrix4::from_translation(Vector3::new(2.0, -3.0, -5.0)),
+        2.0,
         Color::new_rgb(255, 51, 51)
     )));
 
     let sphere3 = Rc::new(RefCell::new(SphereNode::new(
-        "Sphere 3".to_string(),
-        Matrix4::from_translation(Vector3::new(2.0, 1.0, -7.0)),
+        "Sphere Blue".to_string(),
+        Matrix4::from_translation(Vector3::new(-2.0, -3.0, -5.0)),
         2.0,
         Color::new_rgb(51, 51, 255)
     )));
@@ -71,69 +71,69 @@ fn main() {
     
     let sphere_root = Rc::new(RefCell::new(Node3D::new(
         "Sphere root".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, 0.0, -2.0)),
+        Matrix4::from_translation(Vector3::new(0.0, 0.5, 0.0)),
     )));    
 
     value!(sphere_root).add_child(sphere1);
-    value!(sphere_root).add_child(sphere2);
-    value!(sphere_root).add_child(sphere3);
+    //value!(sphere_root).add_child(sphere2);
+    //value!(sphere_root).add_child(sphere3);
     
 
     //----------- Add Planes -------------------
     //let rad = Deg(180.0);
     //let s = Matrix4::from_scale(1.0);
     let r = Matrix4::from_angle_x(Deg(-90.0));
-    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -12.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -8.0));
     let plane1 = Rc::new(RefCell::new(Plane::new(
-        "Plane 1".to_string(),
+        "Plane back grey".to_string(),
         t*r,
-        Color::new_rgb(160, 160, 160)
+        Color::new_rgb(200, 200, 200)
     )));
 
     let r = Matrix4::from_angle_z(Deg(-90.0));
-    let t = Matrix4::from_translation(Vector3::new(6.0, 0.0, -6.0));
+    let t = Matrix4::from_translation(Vector3::new(4.0, 0.0, -6.0));
     let plane2 = Rc::new(RefCell::new(Plane::new(
-        "Plane 2".to_string(),
+        "Plane right green".to_string(),
         t*r,
         Color::new_rgb(128, 255, 128)
     )));
 
     let r = Matrix4::from_angle_z(Deg(90.0));
-    let t = Matrix4::from_translation(Vector3::new(-6.0, 0.0, -6.0));
+    let t = Matrix4::from_translation(Vector3::new(-4.0, 0.0, -6.0));
     let plane3 = Rc::new(RefCell::new(Plane::new(
-        "Plane 3".to_string(),
+        "Plane left red".to_string(),
         t*r,
         Color::new_rgb(255, 128, 128)
     )));
 
     let r = Matrix4::from_angle_z(Deg(0.0));
-    let t = Matrix4::from_translation(Vector3::new(0.0, -5.99, -6.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, -3.99, -6.0));
     let plane4 = Rc::new(RefCell::new(Plane::new(
-        "Plane 4".to_string(),
+        "Plane down grey".to_string(),
         t*r,
-        Color::new_rgb(128, 128, 128)
+        Color::new_rgb(200, 200, 200)
     )));
 
     let r = Matrix4::from_angle_z(Deg(180.0));
-    let t = Matrix4::from_translation(Vector3::new(0.0, 5.99, -6.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, 3.99, -6.0));
     let plane5 = Rc::new(RefCell::new(Plane::new(
-        "Plane 5".to_string(),
+        "Plane up grey".to_string(),
         t*r,
-        Color::new_rgb(128, 128, 128)
+        Color::new_rgb(200, 200, 200)
     )));
 
-    value!(sphere_root).add_child(plane1);
-    value!(sphere_root).add_child(plane2);
-    value!(sphere_root).add_child(plane3);
-    value!(sphere_root).add_child(plane4);
-    value!(sphere_root).add_child(plane5);
+    //value!(sphere_root).add_child(plane1);
+    //value!(sphere_root).add_child(plane2);
+    //value!(sphere_root).add_child(plane3);
+    //value!(sphere_root).add_child(plane4);
+    //value!(sphere_root).add_child(plane5);
     
     //----------- Add Light to Scene ----------
     let light = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
         "Light".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, 5.0, -8.0)),
+        Matrix4::from_translation(Vector3::new(0.0, 3.0, -1.0)),
         Color::new_rgb(255, 255, 255),
-        90.0
+        80.0
     ))));
 
     scene.lights = Rc::clone(&light);

@@ -75,7 +75,7 @@ impl Node for Plane {
                 let hit_point = ray.origin + (ray.direction * distance);
                 let l = hit_point.to_vec() - origin;
                 //let l = l.magnitude();
-                if l.x.abs() < 6.0 && l.y.abs() < 6.0 && l.z.abs() < 6.0 {
+                if l.x.abs() < 4.0 && l.y.abs() < 4.0 && l.z.abs() < 4.0 {
                     return Some((distance, normal));
                 }
             }

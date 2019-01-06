@@ -59,7 +59,7 @@ impl Node for SphereNode {
 
     fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         let origin = Vector3::new(ray.origin.x, ray.origin.y, ray.origin.z);
-        let l = origin - self.world_transform.w.truncate();
+        let l = self.world_transform.w.truncate() - origin;
 
         let adj = l.dot(ray.direction);
         let d2 = l.dot(l) - (adj * adj);
@@ -69,13 +69,13 @@ impl Node for SphereNode {
         }
 
         let thc = (radius2 - d2).sqrt();
-        let t0 = (adj - thc) * -1.0;
-        let t1 = (adj + thc) * -1.0;
+        let t0 = adj - thc;
+        let t1 = adj + thc;
 
         if t0 < 0.0 && t1 < 0.0 {
               return None;
         }
-
+        //println!("test");
         let distance = if t0 < t1 { t0 } else { t1 };
         let hit_point = ray.origin + (ray.direction * distance);
         let normal = hit_point - self.world_transform.w.truncate();

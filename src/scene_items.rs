@@ -91,8 +91,8 @@ impl Ray {
     let fov: f64 = 90.0;
     let fov_adjustment = (fov.to_radians() / 2.0).tan();
     let aspect_ratio = (width as f64) / (height as f64);
-    let sensor_x = ((((x as f64 + 0.5) / width as f64) * 2.0 - 1.0) * aspect_ratio) * fov_adjustment;
-    let sensor_y = (1.0 - ((y as f64 + 0.5) / height as f64) * 2.0) * fov_adjustment;
+    let sensor_x = ((((x as f64 + 0.5) / width as f64) * 2.0 - 1.0) * aspect_ratio); //* fov_adjustment;
+    let sensor_y = (1.0 - ((y as f64 + 0.5) / height as f64) * 2.0); // * fov_adjustment;
     
     //let sensor_x = ((x as f64 + 0.5) / width as f64) * 2.0 - 1.0;
     //let sensor_y = 1.0 - ((y as f64 + 0.5) / height as f64) * 2.0;
