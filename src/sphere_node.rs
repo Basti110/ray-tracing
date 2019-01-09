@@ -76,7 +76,8 @@ impl Node for SphereNode {
               return None;
         }
         //println!("test");
-        let distance = if t0 < t1 { t0 } else { t1 };
+        let distance = if t0 < t1 { if t0 > 0.0 { t0 } else { t1 } } else { t1 };
+
         let hit_point = ray.origin + (ray.direction * distance);
         let normal = hit_point - self.world_transform.w.truncate();
         let normal = -Vector3::new(normal.x, normal.y, normal.z).normalize();

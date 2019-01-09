@@ -41,8 +41,15 @@ impl Light {
 
     pub fn direction_from(&self, hit_point: &Point3<f64>) -> Vector3<f64> {
         match *self {
-            Light::Directional(ref d) => d.direction,
-            Light::Spherical(ref s) => -(Point3::from_vec(s.world_transform.w.truncate()) - *hit_point).normalize(),
+            Light::Directional(ref d) => -d.direction,
+            Light::Spherical(ref s) => (Point3::from_vec(s.world_transform.w.truncate()) - *hit_point).normalize(),
+        }
+    }
+
+    pub fn intersect(&self, ray: &Ray) -> bool {
+        match *self {
+            Light::Directional(ref _d) => false,
+            Light::Spherical(ref s) => s.intersect(ray),
         }
     }
 
@@ -121,7 +128,7 @@ impl Node for DirectionalLight {
         return self.size;
     }
 
-    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
+    fn intersect(&self, _ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         return None;
     }
 
@@ -150,6 +157,28 @@ impl SphericalLight {
             color: color,
             intensity: intensity,
         }
+    }
+
+    fn intersect(&self, ray: &Ray) -> bool {
+        let origin = Vector3::new(ray.origin.x, ray.origin.y, ray.origin.z);
+        let l = self.world_transform.w.truncate() - origin;
+
+        let adj = l.dot(ray.direction);
+        let d2 = l.dot(l) - (adj * adj);
+        let radius2 = 0.25;
+        if d2 > radius2 {
+            return false;
+        }
+
+        let thc = (radius2 - d2).sqrt();
+        let t0 = adj - thc;
+        let t1 = adj + thc;
+
+        if t0 < 0.0 && t1 < 0.0 {
+              return false;
+        }
+
+        return true;
     }
 }
 
@@ -180,7 +209,7 @@ impl Node for SphericalLight {
         return self.size;
     }
 
-    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
+    fn intersect(&self, _ray: &Ray) -> Option<(f64, Vector3<f64>)> {
         return None;
     }
 
@@ -194,5 +223,63 @@ impl Node for SphericalLight {
 
     fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
         self.world_transform = transform * self.frame_transform;
+    }
+}
+
+impl Node for Light {
+    fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
+        match *self {
+            Light::Directional(ref d) => d.get_parent(),
+            Light::Spherical(ref s) => s.get_parent(),
+        }
+    }
+
+    fn get_child(&self, index: usize) -> Option<Rc<RefCell<Node>>> {
+        match *self {
+            Light::Directional(ref d) => d.get_child(index),
+            Light::Spherical(ref s) => s.get_child(index),
+        }
+    }
+
+    fn add_child(&mut self, node: Rc<RefCell<Node>>) {
+        match *self {
+            Light::Directional(ref mut d) => d.add_child(node),
+            Light::Spherical(ref mut s) => s.add_child(node),
+        }
+    }
+
+    fn get_size(&self) -> usize {
+        match *self {
+            Light::Directional(ref d) => d.get_size(),
+            Light::Spherical(ref s) => s.get_size(),
+        }
+    }
+
+    fn intersect(&self, ray: &Ray) -> Option<(f64, Vector3<f64>)> {
+        match *self {
+            Light::Directional(ref d) => None,
+            Light::Spherical(ref s) => None,
+        }
+    }
+
+    fn get_color(&self) -> Color {
+        match *self {
+            Light::Directional(ref d) => d.get_color(),
+            Light::Spherical(ref s) => s.get_color(),
+        }
+    }
+
+    fn get_world_transform(&self) -> Matrix4<f64> {
+        match *self {
+            Light::Directional(ref d) => d.get_world_transform(),
+            Light::Spherical(ref s) => s.get_world_transform(),
+        }
+    }
+
+    fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
+        match *self {
+            Light::Directional(ref mut d) => d.set_world_transform(transform),
+            Light::Spherical(ref mut s) => s.set_world_transform(transform),
+        }
     }
 }

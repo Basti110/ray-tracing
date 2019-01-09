@@ -32,8 +32,8 @@ fn main() {
         "main_camera".to_string(),
         Matrix4::from_translation(Vector3::new(0.0, 0.0, 0.0)),
         Vector3::new(0.0, 0.0, -1.0),
-        600,
-        600
+        858,
+        480
     )));
 
     let root = Rc::new(RefCell::new(Node3D::new(
@@ -49,48 +49,49 @@ fn main() {
 
     let sphere1 = Rc::new(RefCell::new(SphereNode::new(
         "Sphere Green".to_string(),
-        Matrix4::from_translation(Vector3::new(1.0, 0.0, -4.0)),
-        0.5,
+        Matrix4::from_translation(Vector3::new(-2.0, -3.0, -8.0)),
+        1.0,
         Color::new_rgb(51, 255, 51)
     )));
 
     let sphere2 = Rc::new(RefCell::new(SphereNode::new(
         "Sphere Red".to_string(),
-        Matrix4::from_translation(Vector3::new(2.0, -3.0, -5.0)),
-        2.0,
+        Matrix4::from_translation(Vector3::new(0.0, -3.0, -5.5)),
+        1.0,
         Color::new_rgb(255, 51, 51)
     )));
 
     let sphere3 = Rc::new(RefCell::new(SphereNode::new(
         "Sphere Blue".to_string(),
-        Matrix4::from_translation(Vector3::new(-2.0, -3.0, -5.0)),
-        2.0,
+        Matrix4::from_translation(Vector3::new(1.5, -2.5, -7.0)),
+        1.5,
         Color::new_rgb(51, 51, 255)
     )));
 
-    
+    let r = Matrix4::from_angle_x(Deg(10.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -7.0));    
     let sphere_root = Rc::new(RefCell::new(Node3D::new(
         "Sphere root".to_string(),
-        Matrix4::from_translation(Vector3::new(0.0, 0.5, 0.0)),
+        t*r,
     )));    
 
     value!(sphere_root).add_child(sphere1);
-    //value!(sphere_root).add_child(sphere2);
-    //value!(sphere_root).add_child(sphere3);
+    value!(sphere_root).add_child(sphere2);
+    value!(sphere_root).add_child(sphere3);
     
 
     //----------- Add Planes -------------------
     //let rad = Deg(180.0);
     //let s = Matrix4::from_scale(1.0);
-    let r = Matrix4::from_angle_x(Deg(-90.0));
-    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -8.0));
+    let r = Matrix4::from_angle_x(Deg(90.0));
+    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -10.0));
     let plane1 = Rc::new(RefCell::new(Plane::new(
         "Plane back grey".to_string(),
         t*r,
         Color::new_rgb(200, 200, 200)
     )));
 
-    let r = Matrix4::from_angle_z(Deg(-90.0));
+    let r = Matrix4::from_angle_z(Deg(90.0));
     let t = Matrix4::from_translation(Vector3::new(4.0, 0.0, -6.0));
     let plane2 = Rc::new(RefCell::new(Plane::new(
         "Plane right green".to_string(),
@@ -98,7 +99,7 @@ fn main() {
         Color::new_rgb(128, 255, 128)
     )));
 
-    let r = Matrix4::from_angle_z(Deg(90.0));
+    let r = Matrix4::from_angle_z(Deg(-90.0));
     let t = Matrix4::from_translation(Vector3::new(-4.0, 0.0, -6.0));
     let plane3 = Rc::new(RefCell::new(Plane::new(
         "Plane left red".to_string(),
@@ -106,7 +107,7 @@ fn main() {
         Color::new_rgb(255, 128, 128)
     )));
 
-    let r = Matrix4::from_angle_z(Deg(0.0));
+    let r = Matrix4::from_angle_y(Deg(0.0));
     let t = Matrix4::from_translation(Vector3::new(0.0, -3.99, -6.0));
     let plane4 = Rc::new(RefCell::new(Plane::new(
         "Plane down grey".to_string(),
@@ -122,11 +123,11 @@ fn main() {
         Color::new_rgb(200, 200, 200)
     )));
 
-    //value!(sphere_root).add_child(plane1);
-    //value!(sphere_root).add_child(plane2);
-    //value!(sphere_root).add_child(plane3);
-    //value!(sphere_root).add_child(plane4);
-    //value!(sphere_root).add_child(plane5);
+    value!(sphere_root).add_child(plane1);
+    value!(sphere_root).add_child(plane2);
+    value!(sphere_root).add_child(plane3);
+    value!(sphere_root).add_child(plane4);
+    value!(sphere_root).add_child(plane5);
     
     //----------- Add Light to Scene ----------
     let light = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
@@ -137,7 +138,7 @@ fn main() {
     ))));
 
     scene.lights = Rc::clone(&light);
-    //value!(sphere_root).add_child(light);
+    value!(sphere_root).add_child(light);
     value!(root).add_child(sphere_root);
 
     //------------ Render Scene ---------------

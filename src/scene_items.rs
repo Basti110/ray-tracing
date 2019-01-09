@@ -88,11 +88,11 @@ pub struct Ray {
 
 impl Ray {
     pub fn create_prime(x: u32, y: u32, width: u32, height: u32) -> Ray {
-    let fov: f64 = 90.0;
-    let fov_adjustment = (fov.to_radians() / 2.0).tan();
+    let fov: f64 = 45.0;
+    let fov_adjustment = (3.1415926 * 0.5 * fov / 180.).tan(); //(fov.to_radians() / 2.0).tan();
     let aspect_ratio = (width as f64) / (height as f64);
-    let sensor_x = ((((x as f64 + 0.5) / width as f64) * 2.0 - 1.0) * aspect_ratio); //* fov_adjustment;
-    let sensor_y = (1.0 - ((y as f64 + 0.5) / height as f64) * 2.0); // * fov_adjustment;
+    let sensor_x = ((((x as f64 + 0.5) / width as f64) * 2.0 - 1.0) * aspect_ratio) * fov_adjustment;
+    let sensor_y = (1.0 - ((y as f64 + 0.5) / height as f64) * 2.0) * fov_adjustment;
     
     //let sensor_x = ((x as f64 + 0.5) / width as f64) * 2.0 - 1.0;
     //let sensor_y = 1.0 - ((y as f64 + 0.5) / height as f64) * 2.0;

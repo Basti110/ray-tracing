@@ -31,6 +31,12 @@ impl RenderSystem {
                 // if value!(sphere).intersect(&ray) {
                 //     image.put_pixel(x, y, Rgba::from_channels(0, 255, 0, 0));
                 // }
+                if value!(scene.lights).intersect(&ray) {
+                    let c = value!(scene.lights).color();
+                    image.put_pixel(x, y, Rgba::from_channels(c.red(), c.green(), c.blue(), 0));
+                    continue;
+                }
+
                 let root = Rc::clone(&scene.root);
                 match RenderSystem::get_intersection_obj(&ray, root) {
                     None => image.put_pixel(x, y, back),
@@ -99,7 +105,7 @@ impl RenderSystem {
     fn get_color(scene: &Scene, ray: &Ray, intersection: &IntersectionObject) -> Color {
         let hit_point = ray.origin + (ray.direction * (intersection.distance - 0.01));
         //let surface_normal = intersection.element.surface_normal(&hit_point);
-        let direction_to_light = value!(scene.lights).direction_from(&hit_point).normalize();
+        let direction_to_light = -value!(scene.lights).direction_from(&hit_point).normalize();
         let light_power = (intersection.normal.dot(direction_to_light) as f32);
         //println!("{}", light_power);
         //let light_power = (light_power).max(0.0);
@@ -120,11 +126,11 @@ impl RenderSystem {
         let in_light = shadow_intersection.is_none() ||
                        shadow_intersection.unwrap().distance > value!(scene.lights).distance(&hit_point);
         
-        //let light_power = if in_light { light_power } else {  0.0 };
+        let light_power = if in_light { light_power } else {  0.0 };
         
         //let light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) * light_intensity;
-        //let color = value!(intersection.obj).get_color().copy() * value!(scene.lights).color() * light_power * light_reflected;
-        let color = value!(intersection.obj).get_color().copy();
+        let color = value!(intersection.obj).get_color().copy() * value!(scene.lights).color() * light_power * light_reflected;
+        //let color = value!(intersection.obj).get_color().copy();
         color.clamp()
     }
 }

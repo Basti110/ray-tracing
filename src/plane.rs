@@ -65,18 +65,18 @@ impl Node for Plane {
             self.world_transform.z.clone().truncate(),
         );
 
-        let normal =  view_transpose.transpose() * Vector3::new(0.0, -1.0, 0.0);
-        let denom = normal.dot(ray.direction);
+        let normal =  view_transpose.invert().unwrap().transpose() * Vector3::new(0.0, 1.0, 0.0);
+        let denom = normal.dot(-ray.direction);
         if denom > 1e-6 {    
             let origin = self.world_transform.w.truncate();
-            let v = (ray.origin - origin) * -1.0;
+            let v = ray.origin - origin;
             let distance = v.dot(normal) / denom;
             if distance >= 0.0 {
                 let hit_point = ray.origin + (ray.direction * distance);
-                let l = hit_point.to_vec() - origin;
+                let l =  view_transpose.invert().unwrap() * (hit_point.to_vec() - origin);
                 //let l = l.magnitude();
                 if l.x.abs() < 4.0 && l.y.abs() < 4.0 && l.z.abs() < 4.0 {
-                    return Some((distance, normal));
+                    return Some((distance, -normal));
                 }
             }
         }
@@ -92,7 +92,7 @@ impl Node for Plane {
     }
 
     fn set_world_transform(&mut self, transform: &Matrix4<f64>) -> () {
-
+        println!("\n\n------------- {}", self.name);
         println!("------- transform -----------");
         println!("[{}, {}, {}, {}]", self.frame_transform.x.x, self.frame_transform.y.x, self.frame_transform.z.x, self.frame_transform.w.x);
         println!("[{}, {}, {}, {}]", self.frame_transform.x.y, self.frame_transform.y.y, self.frame_transform.z.y, self.frame_transform.w.y);
@@ -110,13 +110,13 @@ impl Node for Plane {
             self.world_transform.x.clone().truncate(),
             self.world_transform.y.clone().truncate(),
             self.world_transform.z.clone().truncate(),
-        ).transpose().invert().unwrap();
+        ).invert().unwrap().transpose();
         println!("-------view-----------");
         println!("[{}, {}, {}]", view_transpose.x.x, view_transpose.y.x, view_transpose.z.x);
         println!("[{}, {}, {}]", view_transpose.x.y, view_transpose.y.y, view_transpose.z.y);
         println!("[{}, {}, {}]", view_transpose.x.z, view_transpose.y.z, view_transpose.z.z);
 
-        let normal =  view_transpose * Vector3::new(0.0, -1.0, 0.0);
+        let normal =  view_transpose * Vector3::new(0.0, 1.0, 0.0);
 
         println!("-------normal-----------");
         println!("[{}, {}, {}]", normal.x, normal.y, normal.z);
