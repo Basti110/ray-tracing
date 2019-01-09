@@ -31,9 +31,18 @@ impl RenderSystem {
                 // if value!(sphere).intersect(&ray) {
                 //     image.put_pixel(x, y, Rgba::from_channels(0, 255, 0, 0));
                 // }
-                if value!(scene.lights).intersect(&ray) {
-                    let c = value!(scene.lights).color();
-                    image.put_pixel(x, y, Rgba::from_channels(c.red(), c.green(), c.blue(), 0));
+                let mut intersect_light = false;
+
+                for light in &scene.lights {
+                    if value!(light).intersect(&ray) {
+                        let c = value!(light).color();
+                        image.put_pixel(x, y, Rgba::from_channels(c.red(), c.green(), c.blue(), 0));
+                        intersect_light = true;
+                        continue;
+                    }
+                }
+
+                if intersect_light {
                     continue;
                 }
 
@@ -105,31 +114,36 @@ impl RenderSystem {
     fn get_color(scene: &Scene, ray: &Ray, intersection: &IntersectionObject) -> Color {
         let hit_point = ray.origin + (ray.direction * (intersection.distance - 0.01));
         //let surface_normal = intersection.element.surface_normal(&hit_point);
-        let direction_to_light = -value!(scene.lights).direction_from(&hit_point).normalize();
-        let light_power = (intersection.normal.dot(direction_to_light) as f32);
-        //println!("{}", light_power);
-        //let light_power = (light_power).max(0.0);
-        //println!("{}", light_power);
-        let light_power = (light_power).max(0.0) * value!(scene.lights).intensity(&hit_point);
-        //
+        let mut power = Color::new(0.0, 0.0, 0.0);
+        for light in &scene.lights {
+            let direction_to_light = -value!(light).direction_from(&hit_point).normalize();
+            let light_power = intersection.normal.dot(direction_to_light).max(0.0) as f32 * value!(light).intensity(&hit_point);
         
-        let light_reflected = 1.0; /// std::f32::consts::PI;
-        //println!("{}", light_power);
+            //println!("{}", light_power);
+            //let light_power = (light_power).max(0.0);
+            //println!("{}", light_power);
+            //let light_power = (light_power).max(0.0) * value!(scene.lights).intensity(&hit_point);
+            //
+            
+            let light_reflected = 1.0; /// std::f32::consts::PI;
+            //println!("{}", light_power);
 
-        let shadow_ray = Ray {
-            origin: hit_point,
-            direction: -direction_to_light,
-        };
+            let shadow_ray = Ray {
+                origin: hit_point,
+                direction: -direction_to_light,
+            };
 
-        let root = Rc::clone(&scene.root);
-        let shadow_intersection = RenderSystem::get_intersection_obj(&shadow_ray, root);
-        let in_light = shadow_intersection.is_none() ||
-                       shadow_intersection.unwrap().distance > value!(scene.lights).distance(&hit_point);
-        
-        let light_power = if in_light { light_power } else {  0.0 };
+            let root = Rc::clone(&scene.root);
+            let shadow_intersection = RenderSystem::get_intersection_obj(&shadow_ray, root);
+            let in_light = shadow_intersection.is_none() ||
+                        shadow_intersection.unwrap().distance > value!(light).distance(&hit_point);
+            
+            let light_power = if in_light { light_power } else {  0.0 };
+            power = power + value!(light).color() * light_power;
+        }
         
         //let light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) * light_intensity;
-        let color = value!(intersection.obj).get_color().copy() * value!(scene.lights).color() * light_power * light_reflected;
+        let color = value!(intersection.obj).get_color().copy() * power; //* light_reflected;
         //let color = value!(intersection.obj).get_color().copy();
         color.clamp()
     }

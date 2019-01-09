@@ -14,7 +14,7 @@ pub struct Scene {
     pub root: Rc<RefCell<Node>>,
     pub name: String,
     //pub mainCamera: Rc<RefCell<CameraNode>>,
-    pub lights: Rc<RefCell<Light>>,
+    pub lights: Vec<Rc<RefCell<Light>>>,
     pub renderer: Rc<RefCell<RenderSystem>>,
 }
 
@@ -24,7 +24,7 @@ impl Scene {
             root: root,
             name: name,
             //mainCamera: camera,
-            lights: Rc::new(RefCell::new(Light::Directional(DirectionalLight::off_light()))),
+            lights: vec![],
             renderer: Rc::new(RefCell::new(RenderSystem {output_path: "output.png".to_string()})),
         }
     }

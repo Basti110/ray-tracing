@@ -69,7 +69,7 @@ fn main() {
     )));
 
     let r = Matrix4::from_angle_x(Deg(10.0));
-    let t = Matrix4::from_translation(Vector3::new(0.0, 0.0, -7.0));    
+    let t = Matrix4::from_translation(Vector3::new(0.0, 1.0, -1.0));    
     let sphere_root = Rc::new(RefCell::new(Node3D::new(
         "Sphere root".to_string(),
         t*r,
@@ -88,7 +88,7 @@ fn main() {
     let plane1 = Rc::new(RefCell::new(Plane::new(
         "Plane back grey".to_string(),
         t*r,
-        Color::new_rgb(200, 200, 200)
+        Color::new_rgb(230, 230, 230)
     )));
 
     let r = Matrix4::from_angle_z(Deg(90.0));
@@ -96,7 +96,7 @@ fn main() {
     let plane2 = Rc::new(RefCell::new(Plane::new(
         "Plane right green".to_string(),
         t*r,
-        Color::new_rgb(128, 255, 128)
+        Color::new_rgb(36, 145, 44)
     )));
 
     let r = Matrix4::from_angle_z(Deg(-90.0));
@@ -104,7 +104,7 @@ fn main() {
     let plane3 = Rc::new(RefCell::new(Plane::new(
         "Plane left red".to_string(),
         t*r,
-        Color::new_rgb(255, 128, 128)
+        Color::new_rgb(229, 57, 57)
     )));
 
     let r = Matrix4::from_angle_y(Deg(0.0));
@@ -112,7 +112,7 @@ fn main() {
     let plane4 = Rc::new(RefCell::new(Plane::new(
         "Plane down grey".to_string(),
         t*r,
-        Color::new_rgb(200, 200, 200)
+        Color::new_rgb(230, 230, 230)
     )));
 
     let r = Matrix4::from_angle_z(Deg(180.0));
@@ -120,7 +120,7 @@ fn main() {
     let plane5 = Rc::new(RefCell::new(Plane::new(
         "Plane up grey".to_string(),
         t*r,
-        Color::new_rgb(200, 200, 200)
+        Color::new_rgb(230, 230, 230)
     )));
 
     value!(sphere_root).add_child(plane1);
@@ -129,16 +129,34 @@ fn main() {
     value!(sphere_root).add_child(plane4);
     value!(sphere_root).add_child(plane5);
     
-    //----------- Add Light to Scene ----------
-    let light = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
-        "Light".to_string(),
+    //----------- Add Lights to Scene ----------
+    let light1 = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
+        "Light white".to_string(),
         Matrix4::from_translation(Vector3::new(0.0, 3.0, -1.0)),
         Color::new_rgb(255, 255, 255),
         80.0
     ))));
 
-    scene.lights = Rc::clone(&light);
-    value!(sphere_root).add_child(light);
+    let light2 = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
+        "Light orange".to_string(),
+        Matrix4::from_translation(Vector3::new(3.95, 0.0, -6.0)),
+        Color::new_rgb(255, 140, 0),
+        10.0
+    ))));
+
+    let light3 = Rc::new(RefCell::new(Light::Spherical(SphericalLight::new(
+        "Light blue".to_string(),
+        Matrix4::from_translation(Vector3::new(-3.95, 0.0, -6.0)),
+        Color::new_rgb(152, 245, 255),
+        10.0
+    ))));
+
+    scene.lights.push(Rc::clone(&light1));
+    scene.lights.push(Rc::clone(&light2));
+    scene.lights.push(Rc::clone(&light3));
+    value!(sphere_root).add_child(light1);
+    value!(sphere_root).add_child(light2);
+    value!(sphere_root).add_child(light3);
     value!(root).add_child(sphere_root);
 
     //------------ Render Scene ---------------

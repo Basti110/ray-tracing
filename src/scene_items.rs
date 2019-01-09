@@ -1,6 +1,6 @@
 use cgmath::{InnerSpace, Vector3, Point3};
 use image::{Pixel, Rgba};
-use std::ops::{Mul};
+use std::ops::{Mul, Add};
 
 pub struct Color {
     pub red: f32,
@@ -77,6 +77,17 @@ impl Mul<f32> for Color {
             red: self.red * other,
             blue: self.blue * other,
             green: self.green * other,
+        }
+    }
+}
+
+impl Add for Color {
+    type Output = Color;
+    fn add(self, other: Color) -> Color {
+        Color {
+            red: self.red + other.red,
+            blue: self.blue + other.blue,
+            green: self.green + other.green,
         }
     }
 }
