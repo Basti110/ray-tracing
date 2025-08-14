@@ -1,4 +1,4 @@
-# Ray Tracing Engine
+# Ray Tracing Engine (2019)
 
 A 3D ray tracing renderer implemented in Rust, featuring a hierarchical scene graph, multiple primitive types, and realistic lighting calculations.
 
@@ -103,4 +103,4 @@ The renderer generates PNG images with configurable resolution. The example scen
 
 ## Author
 
-Sebastian Preuß (sebastian.preuss@rwth-aachen.de)
+Sebastian Preuß (sebastian.ted.preuss@gmail.com)
